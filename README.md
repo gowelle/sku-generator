@@ -1,6 +1,6 @@
 # Laravel SKU Generator
 
-[![Tests](https://github.com/gowelle/sku-generator/actions/workflows/test.yml/badge.svg)](https://github.com/gowelle/sku-generator/actions/workflows/test.yml)
+[![Tests](https://github.com/gowelle/sku-generator/actions/workflows/tests.yml/badge.svg)](https://github.com/gowelle/sku-generator/actions/workflows/tests.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg)](https://packagist.org/packages/gowelle/sku-generator)
 [![Total Downloads](https://img.shields.io/packagist/dt/gowelle/sku-generator.svg)](https://packagist.org/packages/gowelle/sku-generator)
 
