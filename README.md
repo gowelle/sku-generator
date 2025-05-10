@@ -1,13 +1,5 @@
-Here’s the **final `README.md` file** — fully prepared, with badges included at the top for GitHub Actions, Packagist, and License:
-
----
-
 ```markdown
 # gowelle/sku-generator
-
-[![Tests](https://github.com/gowelle/sku-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/gowelle/sku-generator/actions)
-[![Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg)](https://packagist.org/packages/gowelle/sku-generator)
-[![License](https://img.shields.io/github/license/gowelle/sku-generator.svg)](LICENSE)
 
 🎯 **SKU Generator for Laravel**
 
@@ -18,10 +10,9 @@ This package provides automatic, unique, and customizable SKU generation for you
 ## ✨ Features
 
 ✅ Automatic and unique SKU generation  
-✅ Works with products, variants, or any model  
-✅ Supports ULIDs and morph relationships  
+✅ Works with products, variants, or any model
 ✅ Prevents SKU changes after creation (SKU locking)  
-✅ Configurable prefixes, suffixes, separators, and model mappings  
+✅ Configurable prefixes, suffixes, and model mappings  
 ✅ Easy integration via `HasSku` trait  
 ✅ Facade + helper function available  
 ✅ Artisan command to regenerate SKUs  
