@@ -71,14 +71,16 @@ test('it regenerates skus for valid models', function () {
 
     // Run command
     $this->artisan('sku:regenerate', [
-        'model' => TestProduct::class,
+        'model' => TestProduct::class
     ])->assertSuccessful();
 
     // Verify SKUs were updated
     $products = TestProduct::all();
     expect($products)->toHaveCount(2)
-        ->and($products[0]->sku)->toBe('OLD-SKU-1')
-        ->and($products[1]->sku)->toBe('OLD-SKU-2');
+        ->and($products[0]->sku)->not->toBe('OLD-SKU-1')
+        ->and($products[1]->sku)->not->toBe('OLD-SKU-2')
+        ->and($products[0]->sku)->toMatch('/^TM-UNC-[A-Z0-9]+(?:-\d+)?$/')
+        ->and($products[1]->sku)->toMatch('/^TM-UNC-[A-Z0-9]+(?:-\d+)?$/');
 });
 
 test('it fails for non-existent model class', function () {

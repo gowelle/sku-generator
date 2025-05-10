@@ -31,25 +31,26 @@ class SkuGenerator implements SkuGeneratorContract
         };
     }
 
-    public static function generateProductSku(Model $product)
+    public static function generateProductSku(Model $product): string
     {
         $prefix = config('sku-generator.prefix');
         $catLen = config('sku-generator.product_category_length');
         $ulidLen = config('sku-generator.ulid_length');
+        $separator = config('sku-generator.separator', '-');
 
-        $categoryCode = $product->category
+        $categoryCode = $product->category 
             ? strtoupper(substr($product->category->name, 0, $catLen))
             : 'UNC';
 
-        // Generate random alphanumeric string for uniqueness
         $uniqueId = strtoupper(substr(uniqid(), 0, $ulidLen));
 
-        $sku = "{$prefix}-{$categoryCode}-{$uniqueId}";
+        $sku = implode($separator, [
+            $prefix,
+            $categoryCode,
+            $uniqueId
+        ]);
 
-        return self::applyCustomSuffix(
-            self::ensureUniqueSku($sku, $product->getTable()),
-            $product
-        );
+        return self::ensureUniqueSku($sku, $product);
     }
 
     public static function generateVariantSku(Model $variant)
@@ -68,7 +69,7 @@ class SkuGenerator implements SkuGeneratorContract
         $sku = $propertyCodes ? "{$productSku}-{$propertyCodes}" : $productSku;
 
         return self::applyCustomSuffix(
-            self::ensureUniqueSku($sku, $variant->getTable()),
+            self::ensureUniqueSku($sku, $variant),
             $variant
         );
     }
@@ -87,14 +88,17 @@ class SkuGenerator implements SkuGeneratorContract
         return $sku;
     }
 
-    protected static function ensureUniqueSku($baseSku, $table)
+    private static function ensureUniqueSku(string $sku, Model $model): string
     {
-        $sku = $baseSku;
-        $suffix = 1;
+        $originalSku = $sku;
+        $counter = 1;
 
-        while (DB::table($table)->where('sku', $sku)->exists()) {
-            $sku = "{$baseSku}-{$suffix}";
-            $suffix++;
+        while (DB::table($model->getTable())
+            ->where('sku', $sku)
+            ->where('id', '!=', $model->id)
+            ->exists()
+        ) {
+            $sku = $originalSku . '-' . $counter++;
         }
 
         return $sku;
