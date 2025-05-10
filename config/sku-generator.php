@@ -7,7 +7,7 @@ return [
     'property_value_length' => 3,
 
     'models' => [
-        // \App\Models\Product::class => 'product',
+        \Gowelle\SkuGenerator\Tests\TestProduct::class => 'product',
         // \App\Models\ProductVariant::class => 'variant',
     ],
 
