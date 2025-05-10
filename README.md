@@ -1,5 +1,11 @@
 ## gowelle/sku-generator
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/gowelle/sku-generator/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/gowelle/sku-generator/actions?query=workflow%3Atests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/gowelle/sku-generator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/gowelle/sku-generator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
+[![License](https://img.shields.io/packagist/l/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
+
 🎯 **SKU Generator for Laravel**
 
 This package provides automatic, unique, and customizable SKU generation for your Laravel models — perfect for products, variants, or any entity that needs a unique SKU.
@@ -14,7 +20,6 @@ This package provides automatic, unique, and customizable SKU generation for you
 ✅ Configurable prefixes, suffixes, and model mappings  
 ✅ Easy integration via `HasSku` trait  
 ✅ Facade + helper function available  
-✅ Artisan command to regenerate SKUs  
 ✅ Pest test suite included
 
 ---
@@ -78,16 +83,12 @@ class Product extends Model
 }
 ```
 
----
-
 ### 2. Create a product
 
 ```php
 $product = Product::create(['name' => 'Cool Shirt']);
 echo $product->sku; // e.g., TM-CLT-IOUB9ATG
 ```
-
----
 
 ### 3. Use the Facade
 
@@ -99,23 +100,11 @@ $sku = SkuGenerator::generate($product);
 
 ---
 
----
-
-### 4. Run the Artisan command
-
-Regenerate SKUs for a model:
-
-```bash
-php artisan sku:regenerate "App\Models\Product"
-```
-
----
-
 ## 🔑 Config Options
 
 | Option      | Description                                    |
 |-------------|------------------------------------------------|
-| `prefix`   | Prefix for SKUs (default: `TMK`)              |
+| `prefix`   | Prefix for SKUs (default: `TM`)              |
 | `suffix`   | Optional suffix                               |
 | `separator`| Separator between parts (default: `-`)        |
 | `models`   | Model-to-name mapping for SKU generation      |
@@ -136,8 +125,6 @@ Or directly:
 ./vendor/bin/pest
 ```
 
----
-
 ## 🛡 Example Test (PEST)
 
 ```php
@@ -146,12 +133,6 @@ it('generates a unique sku', function () {
     expect($product->sku)->not->toBeEmpty();
 });
 ```
-
----
-
-## 🚀 Roadmap
-
-- Helper function: `sku_regenerate($product)`
 
 ---
 
@@ -173,19 +154,9 @@ MIT © Gowelle
 
 ---
 
-## 🏷 Example
-
-```php
-$product = Product::create(['name' => 'Winter Jacket']);
-echo $product->sku; // TM-CLT-IOUB9ATG
-```
-
----
-
 ## 📣 Stay in Touch
 
 Follow updates and releases:
 
 - [GitHub](https://github.com/gowelle/sku-generator)
 - [Packagist](https://packagist.org/packages/gowelle/sku-generator)
-```
