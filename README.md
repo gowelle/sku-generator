@@ -99,15 +99,9 @@ $sku = SkuGenerator::generate($product);
 
 ---
 
-### 4. Use the helper function
-
-```php
-$sku = sku_generate($product);
-```
-
 ---
 
-### 5. Run the Artisan command
+### 4. Run the Artisan command
 
 Regenerate SKUs for a model:
 
