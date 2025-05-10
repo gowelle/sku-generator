@@ -1,6 +1,6 @@
 {
     "name": "gowelle/sku-generator",
-    "description": "A Laravel package for generating unique and customizable product and variant SKUs.",
+    "description": "Automatic SKU generation for Laravel e-commerce applications, using product categories and property values to create meaningful, hierarchical identifiers.",
     "type": "library",
     "license": "MIT",
     "authors": [
