@@ -1,5 +1,5 @@
 ```markdown
-# gowelle/sku-generator
+## gowelle/sku-generator
 
 🎯 **SKU Generator for Laravel**
 
