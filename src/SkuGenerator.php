@@ -32,10 +32,14 @@ class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContra
         $catLen = config('sku-generator.product_category_length');
         $ulidLen = config('sku-generator.ulid_length');
 
-        $categoryCode = strtoupper(substr($product?->category->name, 0, $catLen));
-        $shortUlid = substr($product->getKey(), 0, $ulidLen);
+        $categoryCode = $product->category 
+            ? strtoupper(substr($product->category->name, 0, $catLen))
+            : 'UNC';
 
-        $sku = "{$prefix}-{$categoryCode}-{$shortUlid}";
+        // Generate random alphanumeric string for uniqueness
+        $uniqueId = strtoupper(substr(uniqid(), 0, $ulidLen));
+
+        $sku = "{$prefix}-{$categoryCode}-{$uniqueId}";
 
         return self::applyCustomSuffix(
             self::ensureUniqueSku($sku, $product->getTable()),

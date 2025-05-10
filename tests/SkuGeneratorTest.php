@@ -1,58 +1,67 @@
 <?php
 
-namespace Gowelle\SkuGenerator\Tests;
+namespace Tests;
 
-use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase;
-use Gowelle\SkuGenerator\SkuGeneratorServiceProvider;
 use Gowelle\SkuGenerator\Concerns\HasSku;
+use Gowelle\SkuGenerator\Facades\SkuGenerator;
+use Gowelle\SkuGenerator\SkuGeneratorServiceProvider;
+use Illuminate\Database\Eloquent\Model;
 
-class SkuGeneratorTest extends TestCase
-{
-    protected function getPackageProviders($app)
-    {
-        return [SkuGeneratorServiceProvider::class];
-    }
+beforeEach(function () {
+    // Register service provider
+    $this->app->register(SkuGeneratorServiceProvider::class);
 
-    /** @test */
-    public function it_generates_a_unique_sku()
-    {
-        $model = new TestProduct();
-        $model->name = 'Test Product';
-        $model->save();
+    // Set up database
+    $this->app['db']->connection()->getSchemaBuilder()->dropIfExists('test_products');
+    $this->app['db']->connection()->getSchemaBuilder()->create('test_products', function ($table) {
+        $table->id();
+        $table->string('name');
+        $table->string('sku')->nullable()->unique();
+        $table->unsignedBigInteger('category_id')->nullable();
+        $table->timestamps();
+    });
 
-        $this->assertNotEmpty($model->sku);
-        $this->assertMatchesRegularExpression('/^PRD-[A-Z0-9]+$/', $model->sku);
-    }
+    // Configure package
+    $this->app['config']->set('sku-generator', [
+        'prefix' => 'TM',
+        'product_category_length' => 3,
+        'ulid_length' => 8,
+        'property_value_length' => 3,
+        'custom_suffix' => null,
+        'models' => [
+            TestProduct::class => 'product',
+        ]
+    ]);
+});
 
-    /** @test */
-    public function it_locks_the_sku_after_creation()
-    {
-        $model = new TestProduct();
-        $model->name = 'Initial Product';
-        $model->save();
+test('generates a unique sku for new products', function () {
+    $product = TestProduct::create([
+        'name' => 'Test Product'
+    ]);
 
-        $originalSku = $model->sku;
+    expect($product->sku)
+        ->not->toBeEmpty()
+        ->toMatch('/^TM-UNC-[A-Z0-9]+$/');
+})->uses(TestCase::class);
 
-        $model->name = 'Updated Product';
-        $model->save();
+test('keeps the original sku when updating products', function () {
+    $product = TestProduct::create([
+        'name' => 'Initial Product'
+    ]);
 
-        $this->assertEquals($originalSku, $model->sku);
-    }
-}
+    $originalSku = $product->sku;
+    
+    $product->refresh();
+    $product->update(['name' => 'Updated Product']);
+
+    expect($product->sku)->toBe($originalSku);
+})->uses(TestCase::class);
 
 class TestProduct extends Model
 {
     use HasSku;
 
-    public $name;
-    public $sku;
-    public $timestamps = false;
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->sku = $model->generateSku();
-        });
-    }
+    protected $fillable = ['name', 'sku'];
+    protected $table = 'test_products';
 }
