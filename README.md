@@ -70,7 +70,7 @@ class ProductVariant extends Model
 {
     use HasSku;
 
-    public function propertyValues()
+    public function values()
     {
         return $this->hasMany(PropertyValue::class);
     }
