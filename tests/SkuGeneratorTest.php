@@ -45,7 +45,8 @@ class TestProduct extends Model
 {
     use HasSku;
 
-    protected $fillable = ['name', 'sku'];
+    public $name;
+    public $sku;
     public $timestamps = false;
 
     protected static function booted()
