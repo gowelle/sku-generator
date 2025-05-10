@@ -1,8 +1,6 @@
 ## gowelle/sku-generator
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/gowelle/sku-generator/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/gowelle/sku-generator/actions?query=workflow%3Atests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/gowelle/sku-generator/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/gowelle/sku-generator/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
 [![License](https://img.shields.io/packagist/l/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
 
