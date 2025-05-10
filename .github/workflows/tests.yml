@@ -9,27 +9,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [8.2]
-        laravel: [10.*, 11.*, 12.*]
-
-    name: P${{ matrix.php }} - L${{ matrix.laravel }}
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip
-          coverage: none
-
-      - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --prefer-dist --no-interaction --no-progress
-
-      - name: Execute tests
-        run: composer test
+    - uses: actions/checkout@v4
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
+        extensions: mbstring, pdo_sqlite
+    - run: composer install --prefer-dist --no-interaction
+    - run: composer test
