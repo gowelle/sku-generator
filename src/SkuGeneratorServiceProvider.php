@@ -14,6 +14,7 @@ class SkuGeneratorServiceProvider extends PackageServiceProvider
         $package
             ->name('sku-generator')
             ->hasConfigFile('sku-generator')
+            ->hasCommand(\Gowelle\SkuGenerator\Console\SkuRegenerateCommand::class)
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile('sku-generator')
@@ -24,9 +25,9 @@ class SkuGeneratorServiceProvider extends PackageServiceProvider
     public function registeringPackage()
     {
         $this->app->bind(SkuGeneratorContract::class, SkuGenerator::class);
-        
+
         $this->app->singleton('gowelle.sku-generator', function ($app) {
-            return new SkuGenerator();
+            return new SkuGenerator;
         });
     }
 }

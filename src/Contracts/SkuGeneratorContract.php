@@ -9,8 +9,8 @@ interface SkuGeneratorContract
     /**
      * Generate SKU for the given model.
      *
-     * @param Model $model
      * @return string
+     *
      * @throws \Exception
      */
     public static function generate(Model $model);
@@ -18,7 +18,6 @@ interface SkuGeneratorContract
     /**
      * Generate SKU for a product.
      *
-     * @param Model $product
      * @return string
      */
     public static function generateProductSku(Model $product);
@@ -26,7 +25,6 @@ interface SkuGeneratorContract
     /**
      * Generate SKU for a variant.
      *
-     * @param Model $variant
      * @return string
      */
     public static function generateVariantSku(Model $variant);

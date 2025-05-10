@@ -1,6 +1,7 @@
 {
     "name": "gowelle/sku-generator",
-    "description": "Automatic SKU generation for Laravel e-commerce applications, using product categories and property values to create meaningful, hierarchical identifiers.",
+    "description": "Automatic SKU generation for Laravel e-commerce applications",
+    "keywords": ["laravel", "sku", "ecommerce", "product", "variant"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -17,7 +18,8 @@
         "pestphp/pest": "^2.0",
         "pestphp/pest-plugin-laravel": "^2.0",
         "orchestra/testbench": "^8.0",
-        "spatie/laravel-package-tools": "^1.0"
+        "spatie/laravel-package-tools": "^1.0",
+        "laravel/pint": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -34,15 +36,17 @@
             "providers": [
                 "Gowelle\\SkuGenerator\\SkuGeneratorServiceProvider"
             ],
-        "aliases": {
-            "SkuGenerator": "Gowelle\\SkuGenerator\\Facades\\SkuGenerator"
+            "aliases": {
+                "SkuGenerator": "Gowelle\\SkuGenerator\\Facades\\SkuGenerator"
             }
         }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
     },
     "config": {
         "allow-plugins": {

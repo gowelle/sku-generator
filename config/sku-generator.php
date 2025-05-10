@@ -14,7 +14,7 @@ return [
     ],
 
     'custom_suffix' => null, // function ($model) {
-        // Example: add country code suffix if present
-        // return property_exists($model, 'country_code') ? $model->country_code : null;
+    // Example: add country code suffix if present
+    // return property_exists($model, 'country_code') ? $model->country_code : null;
     // },
 ];

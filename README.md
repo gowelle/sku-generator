@@ -10,6 +10,18 @@ Automatic SKU generation for Laravel e-commerce applications, using product cate
 
 ---
 
+## ✨ Features
+
+✅ Automatic and unique SKU generation  
+✅ Works with products, variants, or any model  
+✅ Prevents SKU changes after creation (SKU locking)  
+✅ Configurable prefixes, suffixes, and model mappings  
+✅ Easy integration via `HasSku` trait  
+✅ Facade + command to regenerate SKUs for the given model
+✅ Pest test suite included  
+
+---
+
 ## 🏗 Required Structure
 
 ```php
@@ -46,21 +58,9 @@ class ProductVariant extends Model
 
 class PropertyValue extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['title'];
 }
 ```
-
----
-
-## ✨ Features
-
-✅ Automatic and unique SKU generation  
-✅ Works with products, variants, or any model  
-✅ Prevents SKU changes after creation (SKU locking)  
-✅ Configurable prefixes, suffixes, and model mappings  
-✅ Easy integration via `HasSku` trait  
-✅ Facade + helper function available  
-✅ Pest test suite included  
 
 ---
 
