@@ -6,19 +6,61 @@
 
 🎯 **SKU Generator for Laravel**
 
-This package provides automatic, unique, and customizable SKU generation for your Laravel models — perfect for products, variants, or any entity that needs a unique SKU.
+Automatic SKU generation for Laravel e-commerce applications, using product categories and property values to create meaningful, hierarchical identifiers.
+
+---
+
+## 🏗 Required Structure
+
+```php
+class Product extends Model
+{
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+}
+
+class Category extends Model
+{
+    protected $fillable = ['name'];
+}
+
+class ProductVariant extends Model
+{
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function values()
+    {
+        return $this->hasMany(PropertyValue::class);
+    }
+}
+
+class PropertyValue extends Model
+{
+    protected $fillable = ['name'];
+}
+```
 
 ---
 
 ## ✨ Features
 
 ✅ Automatic and unique SKU generation  
-✅ Works with products, variants, or any model
+✅ Works with products, variants, or any model  
 ✅ Prevents SKU changes after creation (SKU locking)  
 ✅ Configurable prefixes, suffixes, and model mappings  
 ✅ Easy integration via `HasSku` trait  
 ✅ Facade + helper function available  
-✅ Pest test suite included
+✅ Pest test suite included  
 
 ---
 
@@ -64,6 +106,23 @@ return [
 ---
 
 ## 🧩 Usage
+
+### Product SKUs
+
+```php
+$product = Product::create([
+    'name' => 'Classic T-Shirt',
+    'category_id' => Category::whereName('T-Shirts')->first()->id
+]);
+echo $product->sku; // TM-TSH-ABC12345
+
+$variant = $product->variants()->create();
+$variant->propertyValues()->createMany([
+    ['name' => 'Red'],
+    ['name' => 'Large']
+]);
+echo $variant->sku; // TM-TSH-ABC12345-RED-LRG
+```
 
 ### 1. Add the `HasSku` trait to your models
 
