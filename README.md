@@ -1,32 +1,55 @@
-## gowelle/sku-generator
+# Laravel SKU Generator
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/gowelle/sku-generator/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/gowelle/sku-generator/actions?query=workflow%3ATests+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
-[![License](https://img.shields.io/packagist/l/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
+[![License](https://img.shields.io/packagist/l/gowelle/sku-generator.svg?style=flat-square)](LICENSE.md)
 
-🎯 **SKU Generator for Laravel**
+Generate meaningful SKUs for your Laravel e-commerce products and variants.
 
-Automatic SKU generation for Laravel e-commerce applications, using product categories and property values to create meaningful, hierarchical identifiers.
+## 📦 Quick Start
 
----
+```bash
+composer require gowelle/sku-generator
+```
 
-## ✨ Features
+```php
+use Gowelle\SkuGenerator\Concerns\HasSku;
 
-✅ Automatic and unique SKU generation  
-✅ Works with products, variants, or any model  
-✅ Prevents SKU changes after creation (SKU locking)  
-✅ Configurable prefixes, suffixes, and model mappings  
-✅ Easy integration via `HasSku` trait  
-✅ Facade + command to regenerate SKUs for the given model
-✅ Pest test suite included  
+class Product extends Model
+{
+    use HasSku;
+}
 
----
+$product = Product::create(['name' => 'T-Shirt']);
+echo $product->sku; // TM-TSH-ABC12345
+```
 
-## 🏗 Required Structure
+## 🎯 Features
+
+- **Automatic Generation**: SKUs are generated on model creation
+- **Meaningful Format**: Uses category codes and property values
+- **Hierarchical**: Variants inherit parent product's SKU
+- **Configurable**: Customize prefixes, lengths, and separators
+- **Lockable**: SKUs cannot be changed after creation
+- **Well-Tested**: Comprehensive Pest test suite
+
+## 📋 Requirements
+
+- PHP 8.2 or higher
+- Laravel 10.0 or higher
+- Models with:
+  - Category relationship (with `name` field)
+  - Optional variants relationship
+  - Optional property values (for variants)
+
+## 🏗 Model Structure
 
 ```php
 class Product extends Model
 {
+    use HasSku;
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -45,175 +68,81 @@ class Category extends Model
 
 class ProductVariant extends Model
 {
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
+    use HasSku;
 
-    public function values()
+    public function propertyValues()
     {
         return $this->hasMany(PropertyValue::class);
     }
 }
-
-class PropertyValue extends Model
-{
-    protected $fillable = ['title'];
-}
 ```
-
----
-
-## 📦 Installation
-
-```bash
-composer require gowelle/sku-generator
-```
-
----
 
 ## ⚙️ Configuration
 
-Publish the config file:
-
 ```bash
-php artisan vendor:publish --tag=sku-generator-config
+php artisan vendor:publish --tag="sku-generator-config"
 ```
 
-This creates `config/sku-generator.php`:
-
 ```php
+// config/sku-generator.php
 return [
     'prefix' => 'TM',
     'product_category_length' => 3,
     'ulid_length' => 8,
     'property_value_length' => 3,
-
     'separator' => '-',
-
+    
     'models' => [
-        // \App\Models\Product::class => 'product',
-        // \App\Models\ProductVariant::class => 'variant',
-    ],
-
-    'custom_suffix' => null, // function ($model) {
-        // Example: add country code suffix if present
-        // return property_exists($model, 'country_code') ? $model->country_code : null;
-    // },
+        \App\Models\Product::class => 'product',
+        \App\Models\ProductVariant::class => 'variant',
+    ]
 ];
 ```
 
----
+## 🧩 Examples
 
-## 🧩 Usage
-
-### Product SKUs
+### Basic Product
 
 ```php
 $product = Product::create([
     'name' => 'Classic T-Shirt',
-    'category_id' => Category::whereName('T-Shirts')->first()->id
+    'category_id' => $category->id
 ]);
-echo $product->sku; // TM-TSH-ABC12345
 
+echo $product->sku; // TM-TSH-ABC12345
+```
+
+### Product with Variant
+
+```php
 $variant = $product->variants()->create();
 $variant->propertyValues()->createMany([
     ['name' => 'Red'],
     ['name' => 'Large']
 ]);
+
 echo $variant->sku; // TM-TSH-ABC12345-RED-LRG
 ```
 
-### 1. Add the `HasSku` trait to your models
-
-```php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Gowelle\SkuGenerator\Traits\HasSku;
-
-class Product extends Model
-{
-    use HasSku;
-
-    protected $fillable = ['name', 'sku'];
-}
-```
-
-### 2. Create a product
-
-```php
-$product = Product::create(['name' => 'Cool Shirt']);
-echo $product->sku; // e.g., TM-CLT-IOUB9ATG
-```
-
-### 3. Use the Facade
-
-```php
-use SkuGenerator;
-
-$sku = SkuGenerator::generate($product);
-```
-
----
-
-## 🔑 Config Options
-
-| Option      | Description                                    |
-|-------------|------------------------------------------------|
-| `prefix`   | Prefix for SKUs (default: `TM`)              |
-| `suffix`   | Optional suffix                               |
-| `separator`| Separator between parts (default: `-`)        |
-| `models`   | Model-to-name mapping for SKU generation      |
-
----
-
 ## ✅ Testing
-
-Run the tests:
 
 ```bash
 composer test
 ```
 
-Or directly:
+## Contributing
 
-```bash
-./vendor/bin/pest
-```
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## 🛡 Example Test (PEST)
+## Security Vulnerabilities
 
-```php
-it('generates a unique sku', function () {
-    $product = Product::create(['name' => 'Test Product']);
-    expect($product->sku)->not->toBeEmpty();
-});
-```
+Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
 
----
+## Credits
 
-## 🤝 Contributing
+- [John Gowelle](https://github.com/gowelle)
+- [All Contributors](../../contributors)
 
-1. Fork this repo  
-2. Create your feature branch  
-3. Commit your changes  
-4. Push to the branch  
-5. Open a pull request
+## License
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
-
----
-
-## 📄 License
-
-MIT © Gowelle
-
----
-
-## 📣 Stay in Touch
-
-Follow updates and releases:
-
-- [GitHub](https://github.com/gowelle/sku-generator)
-- [Packagist](https://packagist.org/packages/gowelle/sku-generator)
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
