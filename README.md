@@ -39,13 +39,22 @@ This creates `config/sku-generator.php`:
 
 ```php
 return [
-    'prefix' => 'TMK',
-    'suffix' => '',
+    'prefix' => 'TM',
+    'product_category_length' => 3,
+    'ulid_length' => 8,
+    'property_value_length' => 3,
+
     'separator' => '-',
+
     'models' => [
-        'Product' => \App\Models\Product::class,
-        'Variant' => \App\Models\Variant::class,
+        // \App\Models\Product::class => 'product',
+        // \App\Models\ProductVariant::class => 'variant',
     ],
+
+    'custom_suffix' => null, // function ($model) {
+        // Example: add country code suffix if present
+        // return property_exists($model, 'country_code') ? $model->country_code : null;
+    // },
 ];
 ```
 
@@ -66,13 +75,6 @@ class Product extends Model
     use HasSku;
 
     protected $fillable = ['name', 'sku'];
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->sku = $model->generateSku();
-        });
-    }
 }
 ```
 
@@ -82,7 +84,7 @@ class Product extends Model
 
 ```php
 $product = Product::create(['name' => 'Cool Shirt']);
-echo $product->sku; // e.g., TMK-COOLSHIRT-8X4LP
+echo $product->sku; // e.g., TM-CLT-IOUB9ATG
 ```
 
 ---
@@ -155,10 +157,7 @@ it('generates a unique sku', function () {
 
 ## 🚀 Roadmap
 
-- Artisan command: `sku:regenerate`  
-- Custom Pest expectations (`toBeValidSku()`)  
-- Snapshot + dataset tests  
-- Laravel Nova / Filament field integration
+- Helper function: `sku_regenerate($product)`
 
 ---
 
@@ -184,7 +183,7 @@ MIT © Gowelle
 
 ```php
 $product = Product::create(['name' => 'Winter Jacket']);
-echo $product->sku; // TMK-WINTERJACKET-AB12CD
+echo $product->sku; // TM-CLT-IOUB9ATG
 ```
 
 ---
@@ -196,5 +195,3 @@ Follow updates and releases:
 - [GitHub](https://github.com/gowelle/sku-generator)
 - [Packagist](https://packagist.org/packages/gowelle/sku-generator)
 ```
-
----

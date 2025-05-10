@@ -4,7 +4,6 @@ namespace Tests;
 
 use Orchestra\Testbench\TestCase;
 use Gowelle\SkuGenerator\Concerns\HasSku;
-use Gowelle\SkuGenerator\Facades\SkuGenerator;
 use Gowelle\SkuGenerator\SkuGeneratorServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,13 +24,20 @@ beforeEach(function () {
     // Configure package
     $this->app['config']->set('sku-generator', [
         'prefix' => 'TM',
-        'product_category_length' => 3,
-        'ulid_length' => 8,
-        'property_value_length' => 3,
-        'custom_suffix' => null,
-        'models' => [
-            TestProduct::class => 'product',
-        ]
+    'product_category_length' => 3,
+    'ulid_length' => 8,
+    'property_value_length' => 3,
+
+    'separator' => '-',
+
+    'models' => [
+        TestProduct::class => 'product',
+    ],
+
+    'custom_suffix' => null, // function ($model) {
+        // Example: add country code suffix if present
+        // return property_exists($model, 'country_code') ? $model->country_code : null;
+    // },
     ]);
 });
 
