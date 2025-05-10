@@ -14,7 +14,7 @@ Please take a moment to read these guidelines.
 2. **Clone your fork**
 
    ```bash
-   git clone https://github.com/your-username/sku-generator.git
+   git clone https://github.com/gowelle/sku-generator.git
    cd sku-generator
    ```
 
@@ -95,4 +95,3 @@ We ❤️ our contributors.
 ## 📣 Contact
 
 If you have questions, feel free to open an issue or reach out on GitHub.
-```
