@@ -58,7 +58,7 @@ class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContra
 
         $propertyCodes = $variant->values
             ->map(fn($pv) => strtoupper(substr($pv->name, 0, $propLen)))
-            ->implode('-');
+            ->implode(config('sku-generator.separator'));
 
         $sku = $propertyCodes ? "{$productSku}-{$propertyCodes}" : $productSku;
 
@@ -75,7 +75,7 @@ class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContra
         if (is_callable($suffixCallback)) {
             $suffix = call_user_func($suffixCallback, $model);
             if (!empty($suffix)) {
-                $sku .= '-' . strtoupper($suffix);
+                $sku .= config('sku-generator.separator') . strtoupper($suffix);
             }
         }
 

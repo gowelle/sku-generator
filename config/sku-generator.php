@@ -6,6 +6,8 @@ return [
     'ulid_length' => 8,
     'property_value_length' => 3,
 
+    'separator' => '-',
+
     'models' => [
         // \App\Models\Product::class => 'product',
         // \App\Models\ProductVariant::class => 'variant',
