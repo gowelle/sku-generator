@@ -1,0 +1,52 @@
+{
+    "name": "gowelle/sku-generator",
+    "description": "A Laravel package for generating unique and customizable product and variant SKUs.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "John Gowelle",
+            "email": "gowelle.john@icloud.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^10.0 || ^11.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "orchestra/testbench": "^8.0",
+        "spatie/laravel-package-tools": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gowelle\\SkuGenerator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Gowelle\\SkuGenerator\\SkuGeneratorServiceProvider"
+            ],
+        "aliases": {
+            "SkuGenerator": "Gowelle\\SkuGenerator\\Facades\\SkuGenerator"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
