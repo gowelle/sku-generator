@@ -2,27 +2,32 @@
 
 namespace Gowelle\SkuGenerator;
 
+use Gowelle\SkuGenerator\Contracts\SkuGeneratorContract;
+use Gowelle\SkuGenerator\Exceptions\InvalidSkuMappingException;
+use Gowelle\SkuGenerator\Support\ConfigValidator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContract
+class SkuGenerator implements SkuGeneratorContract
 {
-    public static function generate(Model $model)
+    public function __construct()
+    {
+        ConfigValidator::validate(config('sku-generator'));
+    }
+
+    public static function generate(Model $model): string
     {
         $mapping = config('sku-generator.models');
-
         $modelClass = get_class($model);
 
-        if (!array_key_exists($modelClass, $mapping)) {
-            throw new \Exception("No SKU generator mapping defined for {$modelClass}");
+        if (! array_key_exists($modelClass, $mapping)) {
+            throw InvalidSkuMappingException::forModel($modelClass);
         }
 
-        $type = $mapping[$modelClass];
-
-        return match ($type) {
+        return match ($mapping[$modelClass]) {
             'product' => self::generateProductSku($model),
             'variant' => self::generateVariantSku($model),
-            default => throw new \Exception("Unsupported SKU type '{$type}' for {$modelClass}"),
+            default => throw InvalidSkuMappingException::forType($mapping[$modelClass], $modelClass),
         };
     }
 
@@ -32,7 +37,7 @@ class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContra
         $catLen = config('sku-generator.product_category_length');
         $ulidLen = config('sku-generator.ulid_length');
 
-        $categoryCode = $product->category 
+        $categoryCode = $product->category
             ? strtoupper(substr($product->category->name, 0, $catLen))
             : 'UNC';
 
@@ -57,7 +62,7 @@ class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContra
         }
 
         $propertyCodes = $variant->values
-            ->map(fn($pv) => strtoupper(substr($pv->name, 0, $propLen)))
+            ->map(fn ($pv) => strtoupper(substr($pv->title, 0, $propLen)))
             ->implode(config('sku-generator.separator'));
 
         $sku = $propertyCodes ? "{$productSku}-{$propertyCodes}" : $productSku;
@@ -74,8 +79,8 @@ class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContra
 
         if (is_callable($suffixCallback)) {
             $suffix = call_user_func($suffixCallback, $model);
-            if (!empty($suffix)) {
-                $sku .= config('sku-generator.separator') . strtoupper($suffix);
+            if (! empty($suffix)) {
+                $sku .= config('sku-generator.separator').strtoupper($suffix);
             }
         }
 

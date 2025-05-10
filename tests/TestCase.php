@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
 use Gowelle\SkuGenerator\SkuGeneratorServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
@@ -23,7 +23,7 @@ class TestCase extends Orchestra
     private function createTestDatabase()
     {
         $this->app['db']->connection()->getSchemaBuilder()->dropIfExists('test_products');
-        
+
         $this->app['db']->connection()->getSchemaBuilder()->create('test_products', function ($table) {
             $table->id();
             $table->string('name');
@@ -37,9 +37,9 @@ class TestCase extends Orchestra
     {
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
     }
 }
