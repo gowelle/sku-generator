@@ -5,7 +5,7 @@ namespace Gowelle\SkuGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkyGeneratorContract
+class SkuGenerator implements \Gowelle\SkuGenerator\Contracts\SkuGeneratorContract
 {
     public static function generate(Model $model)
     {
