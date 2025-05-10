@@ -123,6 +123,24 @@ $variant->propertyValues()->createMany([
 echo $variant->sku; // TM-TSH-ABC12345-RED-LRG
 ```
 
+### Regenerating SKUs
+
+You can regenerate SKUs for existing models using the artisan command:
+
+```bash
+# Regenerate SKUs for all products
+php artisan sku:regenerate "App\Models\Product"
+
+# Regenerate SKUs for all variants
+php artisan sku:regenerate "App\Models\ProductVariant"
+```
+
+The command will:
+- Preserve unique constraints
+- Show progress with old → new SKU mapping
+- Handle large datasets using chunking
+- Skip invalid models
+
 ## ✅ Testing
 
 ```bash
