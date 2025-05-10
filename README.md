@@ -1,9 +1,8 @@
 # Laravel SKU Generator
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/gowelle/sku-generator/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/gowelle/sku-generator/actions?query=workflow%3ATests+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/gowelle/sku-generator.svg?style=flat-square)](https://packagist.org/packages/gowelle/sku-generator)
-[![License](https://img.shields.io/packagist/l/gowelle/sku-generator.svg?style=flat-square)](LICENSE.md)
+[![Tests](https://github.com/gowelle/sku-generator/actions/workflows/test.yml/badge.svg)](https://github.com/gowelle/sku-generator/actions/workflows/test.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/sku-generator.svg)](https://packagist.org/packages/gowelle/sku-generator)
+[![Total Downloads](https://img.shields.io/packagist/dt/gowelle/sku-generator.svg)](https://packagist.org/packages/gowelle/sku-generator)
 
 Generate meaningful SKUs for your Laravel e-commerce products and variants.
 
