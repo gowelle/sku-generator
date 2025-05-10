@@ -1,4 +1,3 @@
-```markdown
 ## gowelle/sku-generator
 
 🎯 **SKU Generator for Laravel**
