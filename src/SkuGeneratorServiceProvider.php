@@ -7,8 +7,29 @@ use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
+/**
+ * Service Provider for the SKU Generator package.
+ * 
+ * This provider handles:
+ * - Package configuration
+ * - Command registration
+ * - Service container bindings
+ * - Facade registration
+ * 
+ * @extends PackageServiceProvider
+ */
 class SkuGeneratorServiceProvider extends PackageServiceProvider
 {
+    /**
+     * Configure the SKU Generator package.
+     * 
+     * Sets up:
+     * - Package name and config
+     * - Artisan commands
+     * - Installation command
+     * 
+     * @param Package $package The package configuration object
+     */
     public function configurePackage(Package $package): void
     {
         $package
@@ -22,6 +43,13 @@ class SkuGeneratorServiceProvider extends PackageServiceProvider
             });
     }
 
+    /**
+     * Register package bindings in the container.
+     * 
+     * Binds:
+     * - Contract to implementation
+     * - Facade singleton
+     */
     public function registeringPackage()
     {
         $this->app->bind(SkuGeneratorContract::class, SkuGenerator::class);
