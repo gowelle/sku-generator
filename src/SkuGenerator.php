@@ -8,6 +8,7 @@ use Gowelle\SkuGenerator\Support\ConfigValidator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -80,48 +81,39 @@ class SkuGenerator implements SkuGeneratorContract
     public static function generateProductSku(Model $product): string
     {
         $config = self::getConfig();
-        $category = self::getProductCategory($product);
-
-        $categoryCode = $category 
-            ? Str::upper(Str::substr($category, 0, $config['category_length']))
-            : self::UNCATEGORIZED;
-
-        $uniqueId = Str::upper(Str::substr(uniqid(), 0, $config['ulid_length']));
-
-        $sku = collect([$config['prefix'], $categoryCode, $uniqueId])
-            ->filter()
-            ->implode($config['separator']);
+        
+        $category = self::getProductCategory($product) ?? self::UNCATEGORIZED;
+        $categoryCode = Str::upper(Str::substr($category, 0, $config['category_length']));
+        
+        // Generate base SKU without numeric suffix
+        $sku = implode($config['separator'], [
+            $config['prefix'],
+            $categoryCode,
+            Str::upper(Str::substr(Str::ulid(), 0, $config['ulid_length']))
+        ]);
 
         return self::ensureUniqueSku($sku, $product);
     }
 
     /**
-     * Generate a SKU for a product variant.
+     * Generate SKU for a variant model.
      *
      * @param Model $variant The variant model
-     * @throws InvalidSkuMappingException When parent product or properties are missing
      * @return string The generated variant SKU
      */
     public static function generateVariantSku(Model $variant): string
     {
+        $config = self::getConfig();
         self::validateVariant($variant);
 
-        $config = self::getConfig();
-        $productSku = $variant->product->sku;
+        $baseSku = $variant->product->sku;
+        $propertyCodes = self::getPropertyCodes($variant, $config);
         
-        if (empty($productSku)) {
-            throw new InvalidSkuMappingException("Product SKU is empty for variant #{$variant->id}");
+        if ($propertyCodes->isEmpty()) {
+            return $baseSku;
         }
 
-        $propertyCodes = self::getPropertyCodes($variant, $config);
-        $sku = $propertyCodes->isEmpty() 
-            ? $productSku 
-            : "{$productSku}{$config['separator']}{$propertyCodes->implode($config['separator'])}";
-
-        return self::ensureUniqueSku(
-            self::applyCustomSuffix($sku, $variant),
-            $variant
-        );
+        return $baseSku . $config['separator'] . $propertyCodes->join($config['separator']);
     }
 
     /**
@@ -159,10 +151,24 @@ class SkuGenerator implements SkuGeneratorContract
      */
     private static function getPropertyCodes(Model $variant, array $config): Collection
     {
-        return $variant->{$config['property_values_accessor']}
-            ->map(fn ($value) => Str::upper(
-                Str::substr($value->{$config['property_values_field']}, 0, $config['property_values_length'])
-            ));
+        // Access config values directly
+        $accessor = $config['property_values_accessor'];
+        $field = $config['property_values_field'];
+        $length = $config['property_values_length'];
+
+        if (!$variant->relationLoaded($accessor)) {
+            $variant->load($accessor);
+        }
+
+        if (!$variant->{$accessor}?->count()) {
+            return collect();
+        }
+
+        return $variant->{$accessor}
+            ->map(fn ($value) => Str::upper(Str::substr($value->{$field}, 0, $length)))
+            ->sort()
+            ->reverse()
+            ->values();
     }
 
     /**
@@ -176,10 +182,6 @@ class SkuGenerator implements SkuGeneratorContract
         if (!$variant->product) {
             throw new InvalidSkuMappingException("Variant must belong to a product");
         }
-
-        if (!$variant->{config('sku-generator.property_values_accessor')}) {
-            throw new InvalidSkuMappingException("Variant must have property values");
-        }
     }
 
     /**
@@ -191,12 +193,12 @@ class SkuGenerator implements SkuGeneratorContract
     {
         return [
             'prefix' => config('sku-generator.prefix'),
-            'category_length' => config('sku-generator.category.length'),
-            'category_field' => config('sku-generator.category.field'),
-            'category_accessor' => config('sku-generator.category.accessor'),
-            'category_has_many' => config('sku-generator.category.has_many'),
             'ulid_length' => config('sku-generator.ulid_length'),
             'separator' => config('sku-generator.separator'),
+            'category_accessor' => config('sku-generator.category.accessor'),
+            'category_field' => config('sku-generator.category.field'),
+            'category_length' => config('sku-generator.category.length'),
+            'category_has_many' => config('sku-generator.category.has_many', false),
             'property_values_accessor' => config('sku-generator.property_values.accessor'),
             'property_values_field' => config('sku-generator.property_values.field'),
             'property_values_length' => config('sku-generator.property_values.length'),
@@ -212,24 +214,24 @@ class SkuGenerator implements SkuGeneratorContract
      */
     private static function ensureUniqueSku(string $sku, Model $model): string
     {
-        static $existingSkus = [];
-        
-        $table = $model->getTable();
-        if (!isset($existingSkus[$table])) {
-            $existingSkus[$table] = DB::table($table)
-                ->where('id', '!=', $model->id)
-                ->pluck('sku')
-                ->toArray();
+        // Get existing SKUs from database
+        $existingSku = $model::where('id', '!=', $model->getKey())
+            ->where('sku', 'LIKE', $sku . '%')
+            ->first();
+
+        // If no conflict exists, return original SKU
+        if (!$existingSku) {
+            return $sku;
         }
 
-        $originalSku = $sku;
+        // Build unique SKU by adding suffix if needed
         $counter = 1;
-
-        while (in_array($sku, $existingSkus[$table])) {
-            $sku = $originalSku . '-' . $counter++;
+        $originalSku = $sku;
+        
+        while ($model::where('sku', $sku)->exists()) {
+            $sku = $originalSku . self::getConfig()['separator'] . $counter++;
         }
 
-        $existingSkus[$table][] = $sku;
         return $sku;
     }
 

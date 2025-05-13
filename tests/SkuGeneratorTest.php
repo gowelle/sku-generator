@@ -22,6 +22,23 @@ beforeEach(function () {
         $table->timestamps();
     });
 
+    $this->app['db']->connection()->getSchemaBuilder()->dropIfExists('test_variants');
+    $this->app['db']->connection()->getSchemaBuilder()->create('test_variants', function ($table) {
+        $table->id();
+        $table->string('name');
+        $table->string('sku')->nullable()->unique();
+        $table->unsignedBigInteger('product_id');
+        $table->timestamps();
+    });
+
+    $this->app['db']->connection()->getSchemaBuilder()->dropIfExists('test_property_values');
+    $this->app['db']->connection()->getSchemaBuilder()->create('test_property_values', function ($table) {
+        $table->id();
+        $table->string('name');
+        $table->unsignedBigInteger('variant_id');
+        $table->timestamps();
+    });
+
     // Configure package
     $this->app['config']->set('sku-generator', [
         'prefix' => 'TM',
@@ -35,13 +52,14 @@ beforeEach(function () {
             'length' => 3,
             'has_many' => false,
         ],
-        'property_value' => [
-            'accessor' => 'values',
-            'field' => 'title',
+        'property_values' => [  // Changed from property_value to property_values
+            'accessor' => 'propertyValues',
+            'field' => 'name',
             'length' => 3,
         ],
         'models' => [
             TestProduct::class => 'product',
+            TestVariant::class => 'variant',
         ],
 
         'custom_suffix' => null, // function ($model) {
@@ -113,6 +131,57 @@ test('it fails for model without HasSku trait', function () {
     ])->assertFailed();
 });
 
+test('it handles variants without property values', function () {
+    $product = TestProduct::create(['name' => 'Test Product']);
+    $variant = TestVariant::create([
+        'name' => 'Test Variant',
+        'product_id' => $product->id,
+    ]);
+
+    $this->artisan('sku:regenerate', [
+        'model' => TestVariant::class,
+        '--force' => true,
+    ])->assertSuccessful();
+
+    // Update pattern to allow for numeric suffixes
+    expect($variant->refresh()->sku)
+        ->not->toBeNull()
+        ->toMatch('/^TM-UNC-[A-Z0-9]+(?:-\d+)*$/');
+});
+
+test('it handles variants with property values', function () {
+    // Suppress deprecation warnings
+    error_reporting(E_ALL & ~E_DEPRECATED);
+    
+    // Create test models
+    $product = TestProduct::create(['name' => 'Test Product']);
+    $variant = TestVariant::create([
+        'name' => 'Test Variant',
+        'product_id' => $product->id,
+    ]);
+
+    // Create and verify property values
+    $variant->propertyValues()->createMany([
+        ['name' => 'Red'],
+        ['name' => 'Large']
+    ]);
+
+    // Force refresh to ensure relations are loaded
+    $variant->load(['product', 'propertyValues']);
+
+    // Run command
+    $this->artisan('sku:regenerate', [
+        'model' => TestVariant::class,
+        '--force' => true,
+    ])->assertSuccessful();
+
+    // Verify results
+    $variant->refresh();
+
+    expect($variant->propertyValues)->toHaveCount(2)
+        ->and($variant->sku)->toMatch('/^TM-UNC-[A-Z0-9]+-RED-LAR$/');
+})->group('debug');
+
 class InvalidProduct extends Model
 {
     protected $fillable = ['name', 'sku'];
@@ -124,4 +193,34 @@ class TestProduct extends Model
 
     protected $fillable = ['name', 'sku'];
     protected $table = 'test_products';
+}
+
+class TestVariant extends Model
+{
+    use HasSku;
+
+    protected $fillable = ['name', 'sku', 'product_id'];
+    protected $table = 'test_variants';
+    protected $with = ['propertyValues']; // Eager load property values
+
+    public function product()
+    {
+        return $this->belongsTo(TestProduct::class);
+    }
+
+    public function propertyValues()
+    {
+        return $this->hasMany(TestPropertyValue::class, 'variant_id');
+    }
+}
+
+class TestPropertyValue extends Model
+{
+    protected $fillable = ['name', 'variant_id'];
+    protected $table = 'test_property_values';
+
+    public function variant()
+    {
+        return $this->belongsTo(TestVariant::class);
+    }
 }
