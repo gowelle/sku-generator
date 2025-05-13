@@ -1,7 +1,6 @@
 {
     "name": "gowelle/sku-generator",
     "description": "Generate meaningful SKUs for Laravel e-commerce products and variants",
-    "version": "1.1.0",
     "keywords": ["laravel", "sku", "ecommerce", "product", "variant"],
     "type": "library",
     "license": "MIT",
@@ -14,7 +13,7 @@
     "require": {
         "php": "^8.2",
         "illuminate/support": "^10.0 || ^11.0 || ^12.0",
-        "laravel/prompts": "^0.1.25"
+        "laravel/prompts": "^0.3.0"
     },
     "require-dev": {
         "pestphp/pest": "^2.0",
