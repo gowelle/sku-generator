@@ -113,7 +113,9 @@ class SkuGenerator implements SkuGeneratorContract
             return $baseSku;
         }
 
-        return $baseSku . $config['separator'] . $propertyCodes->join($config['separator']);
+        $sku = $baseSku . $config['separator'] . $propertyCodes->join($config['separator']);
+        
+        return self::ensureUniqueSku($sku, $variant);
     }
 
     /**
