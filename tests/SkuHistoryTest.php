@@ -201,6 +201,7 @@ test('can query recent changes', function () {
         'new_sku' => 'OLD-SKU',
         'event_type' => SkuHistory::EVENT_CREATED,
         'created_at' => now()->subDays(10),
+        'updated_at' => now()->subDays(10),
     ]);
 
     $recentHistory = SkuHistory::recentChanges(7)->get();
@@ -257,6 +258,7 @@ test('cleanup removes old records', function () {
         'new_sku' => 'OLD-SKU-1',
         'event_type' => SkuHistory::EVENT_CREATED,
         'created_at' => now()->subDays(400),
+        'updated_at' => now()->subDays(400),
     ]);
 
     SkuHistory::create([
@@ -265,6 +267,7 @@ test('cleanup removes old records', function () {
         'new_sku' => 'OLD-SKU-2',
         'event_type' => SkuHistory::EVENT_CREATED,
         'created_at' => now()->subDays(200),
+        'updated_at' => now()->subDays(200),
     ]);
 
     expect(SkuHistory::count())->toBe(3);
@@ -297,6 +300,7 @@ test('sku:history:cleanup command works', function () {
         'new_sku' => 'OLD-SKU',
         'event_type' => SkuHistory::EVENT_CREATED,
         'created_at' => now()->subDays(400),
+        'updated_at' => now()->subDays(400),
     ]);
 
     $this->artisan('sku:history:cleanup', [

@@ -98,7 +98,7 @@ trait HasSku
      */
     public function forceRegenerateSku(?string $reason = null): bool
     {
-        $oldSku = $this->sku;
+        $oldSku = $this->sku ?? '';
         $this->forceSkuRegeneration = true;
         $this->sku = $this->generateSku();
         $saved = $this->save();

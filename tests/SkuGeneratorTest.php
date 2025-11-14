@@ -39,6 +39,27 @@ beforeEach(function () {
         $table->timestamps();
     });
 
+    // Set up sku_histories table
+    $this->app['db']->connection()->getSchemaBuilder()->dropIfExists('sku_histories');
+    $this->app['db']->connection()->getSchemaBuilder()->create('sku_histories', function ($table) {
+        $table->id();
+        $table->string('old_sku')->nullable()->index();
+        $table->string('new_sku')->nullable()->index();
+        $table->string('model_type')->index();
+        $table->unsignedBigInteger('model_id')->index();
+        $table->string('event_type');
+        $table->unsignedBigInteger('user_id')->nullable();
+        $table->string('user_type')->nullable();
+        $table->text('metadata')->nullable();
+        $table->string('reason')->nullable();
+        $table->string('ip_address', 45)->nullable();
+        $table->string('user_agent')->nullable();
+        $table->timestamps();
+
+        $table->index(['model_type', 'model_id']);
+        $table->index('created_at');
+    });
+
     // Configure package
     $this->app['config']->set('sku-generator', [
         'prefix' => 'TM',
@@ -60,6 +81,15 @@ beforeEach(function () {
         'models' => [
             TestProduct::class => 'product',
             TestVariant::class => 'variant',
+        ],
+
+        'history' => [
+            'enabled' => true,
+            'track_user' => false,
+            'track_ip' => false,
+            'track_user_agent' => false,
+            'retention_days' => null,
+            'table_name' => 'sku_histories',
         ],
 
         'custom_suffix' => null, // function ($model) {
