@@ -100,7 +100,19 @@ trait HasSku
     {
         $oldSku = $this->sku ?? '';
         $this->forceSkuRegeneration = true;
-        $this->sku = $this->generateSku();
+        
+        // Ensure we generate a different SKU (retry if needed)
+        $attempts = 0;
+        do {
+            $this->sku = $this->generateSku();
+            $attempts++;
+            
+            // Add a small delay on retry to ensure time-based uniqueness
+            if ($attempts > 1 && $attempts < 10) {
+                usleep(1000); // 1ms delay
+            }
+        } while ($this->sku === $oldSku && $attempts < 10);
+        
         $saved = $this->save();
         $this->forceSkuRegeneration = false;
 

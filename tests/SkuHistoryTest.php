@@ -9,6 +9,7 @@ use Gowelle\SkuGenerator\Models\SkuHistory;
 use Gowelle\SkuGenerator\Services\SkuHistoryLogger;
 use Gowelle\SkuGenerator\SkuGeneratorServiceProvider;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
 use Gowelle\SkuGenerator\Concerns\HasSku;
@@ -121,7 +122,7 @@ test('creates history record when model is deleted', function () {
 })->uses(TestCase::class);
 
 test('fires SkuCreated event', function () {
-    Event::fake();
+    Event::fake([SkuCreated::class]);
 
     $product = HistoryTestProduct::create(['name' => 'Test Product']);
 
@@ -132,7 +133,7 @@ test('fires SkuCreated event', function () {
 })->uses(TestCase::class);
 
 test('fires SkuRegenerated event', function () {
-    Event::fake();
+    Event::fake([SkuRegenerated::class]);
 
     $product = HistoryTestProduct::create(['name' => 'Test Product']);
     $oldSku = $product->sku;
@@ -147,7 +148,7 @@ test('fires SkuRegenerated event', function () {
 })->uses(TestCase::class);
 
 test('fires SkuDeleted event', function () {
-    Event::fake();
+    Event::fake([SkuDeleted::class]);
 
     $product = HistoryTestProduct::create(['name' => 'Test Product']);
     $sku = $product->sku;
@@ -194,8 +195,8 @@ test('can query history by event type', function () {
 test('can query recent changes', function () {
     $product = HistoryTestProduct::create(['name' => 'Test Product']);
 
-    // Create an old record
-    SkuHistory::create([
+    // Create an old record using DB insert to ensure timestamp is respected
+    DB::table('sku_histories')->insert([
         'model_type' => HistoryTestProduct::class,
         'model_id' => $product->id,
         'new_sku' => 'OLD-SKU',
@@ -251,8 +252,8 @@ test('SkuHistoryLogger service works correctly', function () {
 test('cleanup removes old records', function () {
     $product = HistoryTestProduct::create(['name' => 'Test Product']);
 
-    // Create old records
-    SkuHistory::create([
+    // Create old records using DB insert to ensure timestamps are respected
+    DB::table('sku_histories')->insert([
         'model_type' => HistoryTestProduct::class,
         'model_id' => $product->id,
         'new_sku' => 'OLD-SKU-1',
@@ -261,7 +262,7 @@ test('cleanup removes old records', function () {
         'updated_at' => now()->subDays(400),
     ]);
 
-    SkuHistory::create([
+    DB::table('sku_histories')->insert([
         'model_type' => HistoryTestProduct::class,
         'model_id' => $product->id,
         'new_sku' => 'OLD-SKU-2',
@@ -293,8 +294,8 @@ test('sku:history command displays history', function () {
 test('sku:history:cleanup command works', function () {
     $product = HistoryTestProduct::create(['name' => 'Test Product']);
 
-    // Create old record
-    SkuHistory::create([
+    // Create old record using DB insert to ensure timestamp is respected
+    DB::table('sku_histories')->insert([
         'model_type' => HistoryTestProduct::class,
         'model_id' => $product->id,
         'new_sku' => 'OLD-SKU',
