@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "Bash(composer list:*)",
+      "Bash(composer show:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
