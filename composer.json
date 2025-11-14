@@ -1,7 +1,7 @@
 {
     "name": "gowelle/sku-generator",
     "description": "Generate meaningful SKUs for Laravel e-commerce products and variants",
-    "keywords": ["laravel", "sku", "ecommerce", "product", "variant"],
+    "keywords": ["laravel", "sku", "e-commerce", "product", "variant"],
     "type": "library",
     "license": "MIT",
     "authors": [
