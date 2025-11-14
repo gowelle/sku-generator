@@ -110,7 +110,10 @@ trait HasSku
      */
     public function getSkuHistory()
     {
-        return $this->skuHistory()->latest()->get();
+        return $this->skuHistory()
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
     }
 
     /**
@@ -120,6 +123,9 @@ trait HasSku
      */
     public function getLatestSkuHistory(): ?SkuHistory
     {
-        return $this->skuHistory()->latest()->first();
+        return $this->skuHistory()
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->first();
     }
 }
