@@ -42,30 +42,9 @@ trait HasSku
         });
 
         static::updating(function ($model) {
-            if ($model->isDirty('sku')) {
-                if (!$model->forceSkuRegeneration) {
-                    // Prevent SKU modification unless forced
-                    $model->sku = $model->getOriginal('sku');
-                } else {
-                    // Track manual modification
-                    $oldSku = $model->getOriginal('sku');
-                    $newSku = $model->sku;
-
-                    if ($oldSku !== $newSku) {
-                        event(new SkuModified($model, $oldSku, $newSku));
-                    }
-                }
-            }
-        });
-
-        static::updated(function ($model) {
-            if ($model->wasChanged('sku') && $model->forceSkuRegeneration) {
-                $oldSku = $model->getOriginal('sku');
-                $newSku = $model->sku;
-
-                if ($oldSku !== $newSku) {
-                    app(SkuHistoryLogger::class)->logModification($model, $oldSku, $newSku);
-                }
+            if ($model->isDirty('sku') && !$model->forceSkuRegeneration) {
+                // Prevent SKU modification unless forced
+                $model->sku = $model->getOriginal('sku');
             }
         });
 
