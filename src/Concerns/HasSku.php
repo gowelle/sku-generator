@@ -2,6 +2,12 @@
 
 namespace Gowelle\SkuGenerator\Concerns;
 
+use Gowelle\SkuGenerator\Events\SkuCreated;
+use Gowelle\SkuGenerator\Events\SkuDeleted;
+use Gowelle\SkuGenerator\Events\SkuModified;
+use Gowelle\SkuGenerator\Events\SkuRegenerated;
+use Gowelle\SkuGenerator\Models\SkuHistory;
+use Gowelle\SkuGenerator\Services\SkuHistoryLogger;
 use Gowelle\SkuGenerator\SkuGenerator;
 
 /**
@@ -28,9 +34,24 @@ trait HasSku
             }
         });
 
+        static::created(function ($model) {
+            if (!empty($model->sku)) {
+                event(new SkuCreated($model, $model->sku));
+                app(SkuHistoryLogger::class)->logCreation($model, $model->sku);
+            }
+        });
+
         static::updating(function ($model) {
             if ($model->isDirty('sku') && !$model->forceSkuRegeneration) {
+                // Prevent SKU modification unless forced
                 $model->sku = $model->getOriginal('sku');
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (!empty($model->sku)) {
+                event(new SkuDeleted($model, $model->sku));
+                app(SkuHistoryLogger::class)->logDeletion($model, $model->sku);
             }
         });
     }
@@ -51,15 +72,60 @@ trait HasSku
      * This method temporarily allows SKU modification and generates
      * a new SKU even if one already exists.
      *
+     * @param string|null $reason Optional reason for regeneration
      * @return bool Whether the save operation was successful
      */
-    public function forceRegenerateSku(): bool
+    public function forceRegenerateSku(?string $reason = null): bool
     {
+        $oldSku = $this->sku;
         $this->forceSkuRegeneration = true;
         $this->sku = $this->generateSku();
         $saved = $this->save();
         $this->forceSkuRegeneration = false;
-        
-        return $saved;
+
+        // Always fire event and log history for explicit regeneration requests
+        // save() returns affected rows (could be 0), not boolean, so check !== false
+        if ($saved !== false) {
+            event(new SkuRegenerated($this, $oldSku, $this->sku, $reason));
+            app(SkuHistoryLogger::class)->logRegeneration($this, $oldSku, $this->sku, $reason);
+        }
+
+        return $saved !== false;
+    }
+
+    /**
+     * Get the SKU history for this model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function skuHistory()
+    {
+        return $this->morphMany(SkuHistory::class, 'model');
+    }
+
+    /**
+     * Get all SKU history entries for this model.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getSkuHistory()
+    {
+        return $this->skuHistory()
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+    }
+
+    /**
+     * Get the most recent SKU history entry.
+     *
+     * @return SkuHistory|null
+     */
+    public function getLatestSkuHistory(): ?SkuHistory
+    {
+        return $this->skuHistory()
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->first();
     }
 }

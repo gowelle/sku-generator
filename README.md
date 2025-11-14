@@ -102,6 +102,152 @@ Features:
 - Failure logging
 - Unique constraint preservation
 
+## SKU History & Audit Trail
+
+The package includes a comprehensive audit trail system to track all SKU lifecycle events.
+
+### Setup
+
+Publish and run the migration:
+
+```bash
+php artisan vendor:publish --tag="sku-generator-migrations"
+php artisan migrate
+```
+
+### Configuration
+
+Configure history tracking in `config/sku-generator.php`:
+
+```php
+'history' => [
+    'enabled' => env('SKU_HISTORY_ENABLED', true),
+    'track_user' => true,
+    'track_ip' => false,
+    'track_user_agent' => false,
+    'retention_days' => null, // null = keep forever
+    'table_name' => 'sku_histories',
+],
+```
+
+### Tracked Events
+
+The following events are automatically tracked:
+
+- **Created**: When a new SKU is generated
+- **Regenerated**: When `forceRegenerateSku()` is called
+- **Modified**: When a SKU is manually modified
+- **Deleted**: When a model with a SKU is deleted
+
+### Viewing History
+
+#### Via Model Relationship
+
+```php
+// Get all history for a model
+$history = $product->skuHistory;
+
+// Get latest history entry
+$latest = $product->getLatestSkuHistory();
+
+// Get all history entries
+$allHistory = $product->getSkuHistory();
+```
+
+#### Via Artisan Command
+
+```bash
+# View history for a specific model
+php artisan sku:history "App\Models\Product" --id=123
+
+# View history for a specific SKU
+php artisan sku:history --sku="TM-TSH-ABC12345"
+
+# View recent changes
+php artisan sku:history --recent --days=7
+
+# Filter by event type
+php artisan sku:history --event=regenerated --limit=100
+```
+
+### Query Interface
+
+Use the `SkuHistory` model to query history:
+
+```php
+use Gowelle\SkuGenerator\Models\SkuHistory;
+
+// Get history for a specific model
+SkuHistory::forModel($product)->get();
+
+// Find history for a specific SKU
+SkuHistory::forSku('TM-TSH-ABC12345')->get();
+
+// Filter by event type
+SkuHistory::byEventType('regenerated')->get();
+
+// Get recent changes
+SkuHistory::recentChanges(7)->get();
+
+// Filter by date range
+SkuHistory::between('2024-01-01', '2024-12-31')->get();
+
+// Filter by user
+SkuHistory::byUser($userId)->get();
+```
+
+### Events
+
+The package dispatches Laravel events for all SKU changes:
+
+```php
+use Gowelle\SkuGenerator\Events\{SkuCreated, SkuRegenerated, SkuModified, SkuDeleted};
+
+// Listen to events in your EventServiceProvider
+Event::listen(SkuRegenerated::class, function ($event) {
+    // $event->model - The model that was changed
+    // $event->oldSku - The previous SKU
+    // $event->newSku - The new SKU
+    // $event->reason - Optional reason for change
+});
+```
+
+### Cleanup Old History
+
+Clean up old history records:
+
+```bash
+# Cleanup based on configured retention policy
+php artisan sku:history:cleanup
+
+# Delete records older than 365 days
+php artisan sku:history:cleanup --days=365
+
+# Delete records before a specific date
+php artisan sku:history:cleanup --before="2024-01-01"
+
+# Preview what would be deleted
+php artisan sku:history:cleanup --days=365 --dry-run
+
+# Skip confirmation
+php artisan sku:history:cleanup --days=365 --force
+```
+
+### Disabling History
+
+To disable history tracking:
+
+```php
+// In config/sku-generator.php
+'history' => [
+    'enabled' => false,
+    // ...
+],
+
+// Or via environment variable
+SKU_HISTORY_ENABLED=false
+```
+
 ## Testing
 
 ```bash

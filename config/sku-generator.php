@@ -96,4 +96,27 @@ return [
     |
     */
     'custom_suffix' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | SKU History & Audit Trail
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for tracking SKU lifecycle events:
+    | - enabled: Enable/disable history logging
+    | - track_user: Track the authenticated user who made changes
+    | - track_ip: Track the IP address of the user
+    | - track_user_agent: Track the user agent string
+    | - retention_days: How long to keep history (null = forever)
+    | - table_name: Database table name for history records
+    |
+    */
+    'history' => [
+        'enabled' => env('SKU_HISTORY_ENABLED', true),
+        'track_user' => true,
+        'track_ip' => false,
+        'track_user_agent' => false,
+        'retention_days' => null, // null = keep forever, int = days to retain
+        'table_name' => 'sku_histories',
+    ],
 ];

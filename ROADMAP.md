@@ -1,8 +1,8 @@
 # SKU Generator - Product Roadmap
 
-## Current Version: 1.1.1
+## Current Version: 1.2.0
 
-## Next Feature: SKU History & Audit Trail (v1.2.0)
+## Latest Feature: SKU History & Audit Trail (v1.2.0) ✅
 
 ### Executive Summary
 Implement a comprehensive audit trail system to track all SKU lifecycle events, providing transparency, compliance support, and debugging capabilities for production e-commerce systems.
@@ -119,30 +119,29 @@ Track relationships in history:
 
 ### Technical Implementation
 
-#### Phase 1: Core Infrastructure (Week 1)
-- [ ] Create migration for `sku_histories` table
-- [ ] Create `SkuHistory` model with relationships
-- [ ] Add configuration options
-- [ ] Create events (SkuCreated, SkuRegenerated, etc.)
+#### Phase 1: Core Infrastructure ✅
+- [x] Create migration for `sku_histories` table
+- [x] Create `SkuHistory` model with relationships
+- [x] Add configuration options
+- [x] Create events (SkuCreated, SkuRegenerated, SkuModified, SkuDeleted)
 
-#### Phase 2: Integration (Week 1-2)
-- [ ] Integrate logging into `HasSku` trait
-- [ ] Update `SkuGenerator` to emit events
-- [ ] Add history logging to regenerate command
-- [ ] Implement query scopes and helper methods
+#### Phase 2: Integration ✅
+- [x] Integrate logging into `HasSku` trait
+- [x] Update `SkuGenerator` to emit events
+- [x] Add history logging to regenerate command
+- [x] Implement query scopes and helper methods
 
-#### Phase 3: Commands & Tools (Week 2)
-- [ ] Create `sku:history` command for viewing history
-- [ ] Create `sku:history:cleanup` command
-- [ ] Add history cleanup to scheduler
-- [ ] Implement retention policy
+#### Phase 3: Commands & Tools ✅
+- [x] Create `sku:history` command for viewing history
+- [x] Create `sku:history:cleanup` command
+- [x] Implement retention policy
 
-#### Phase 4: Testing & Documentation (Week 2-3)
-- [ ] Unit tests for history logging
-- [ ] Integration tests for all event types
-- [ ] Test retention and cleanup
-- [ ] Update README with history documentation
-- [ ] Add examples to documentation
+#### Phase 4: Testing & Documentation ✅
+- [x] Unit tests for history logging
+- [x] Integration tests for all event types
+- [x] Test retention and cleanup
+- [x] Update README with history documentation
+- [x] Add examples to documentation
 
 ### Backward Compatibility
 - Feature is opt-in via configuration
@@ -288,7 +287,7 @@ SkuFactory::makePattern('{pattern}'); // Custom pattern
 
 ## Release Schedule
 
-- **v1.2.0** (Q1 2026): SKU History & Audit Trail
+- **v1.2.0** (Released): ✅ SKU History & Audit Trail
 - **v1.3.0** (Q2 2026): Custom Patterns & Preview
 - **v1.4.0** (Q3 2026): Events & Multi-tenant Support
 - **v1.5.0** (Q4 2026): Advanced Category & Soft Delete
@@ -313,5 +312,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to these
 ---
 
 **Last Updated:** 2025-11-14
-**Current Version:** 1.1.1
-**Next Release:** v1.2.0 (SKU History & Audit Trail)
+**Current Version:** 1.2.0
+**Latest Release:** v1.2.0 (SKU History & Audit Trail) ✅
+**Next Release:** v1.3.0 (Custom Patterns & Preview)

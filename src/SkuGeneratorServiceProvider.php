@@ -35,10 +35,16 @@ class SkuGeneratorServiceProvider extends PackageServiceProvider
         $package
             ->name('sku-generator')
             ->hasConfigFile('sku-generator')
-            ->hasCommand(\Gowelle\SkuGenerator\Console\SkuRegenerateCommand::class)
+            ->hasMigration('create_sku_histories_table')
+            ->hasCommands([
+                \Gowelle\SkuGenerator\Console\SkuRegenerateCommand::class,
+                \Gowelle\SkuGenerator\Console\SkuHistoryCommand::class,
+                \Gowelle\SkuGenerator\Console\SkuHistoryCleanupCommand::class,
+            ])
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile('sku-generator')
+                    ->publishMigrations()
                     ->copyAndRegisterServiceProviderInApp();
             });
     }
