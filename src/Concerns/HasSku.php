@@ -77,21 +77,9 @@ trait HasSku
      */
     public function forceRegenerateSku(?string $reason = null): bool
     {
-        $oldSku = $this->sku ?? '';
+        $oldSku = $this->sku;
         $this->forceSkuRegeneration = true;
-        
-        // Ensure we generate a different SKU (retry if needed)
-        $attempts = 0;
-        do {
-            $this->sku = $this->generateSku();
-            $attempts++;
-            
-            // Add a small delay on retry to ensure time-based uniqueness
-            if ($attempts > 1 && $attempts < 10) {
-                usleep(1000); // 1ms delay
-            }
-        } while ($this->sku === $oldSku && $attempts < 10);
-        
+        $this->sku = $this->generateSku();
         $saved = $this->save();
         $this->forceSkuRegeneration = false;
 
