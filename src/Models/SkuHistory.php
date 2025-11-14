@@ -197,7 +197,7 @@ class SkuHistory extends Model
      */
     public function scopeLatest($query)
     {
-        return $query->orderBy('created_at', 'desc');
+        return $query->orderBy('created_at', 'desc')->orderBy('id', 'desc');
     }
 
     /**
