@@ -83,7 +83,9 @@ trait HasSku
         $saved = $this->save();
         $this->forceSkuRegeneration = false;
 
-        if ($saved && $oldSku !== $this->sku) {
+        // Always fire event and log history for explicit regeneration requests
+        // Even if SKU happens to be identical (e.g., with short ULID lengths)
+        if ($saved) {
             event(new SkuRegenerated($this, $oldSku, $this->sku, $reason));
             app(SkuHistoryLogger::class)->logRegeneration($this, $oldSku, $this->sku, $reason);
         }
