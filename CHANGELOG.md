@@ -4,6 +4,11 @@ All notable changes to `sku-generator` will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-12-XX
+
+### Changed
+- Enhanced documentation with instructions for customizing migrations when using non-integer primary keys (UUID, string, etc.)
+
 ## [1.2.0] - 2025-11-14
 
 ### Added

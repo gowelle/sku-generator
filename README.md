@@ -73,10 +73,12 @@ return [
 ## SKU Format
 
 ### Products
+
 - Format: `{prefix}-{category}-{unique}`
 - Example: `TM-TSH-ABC12345`
 
 ### Variants
+
 - Format: `{prefix}-{category}-{unique}-{properties}`
 - Example: `TM-TSH-ABC12345-RED-LRG`
 
@@ -96,6 +98,7 @@ php artisan sku:regenerate --force
 ```
 
 Features:
+
 - Interactive model selection
 - Progress reporting
 - Chunked processing
@@ -114,6 +117,46 @@ Publish and run the migration:
 php artisan vendor:publish --tag="sku-generator-migrations"
 php artisan migrate
 ```
+
+#### Customizing for Non-Integer Primary Keys
+
+If your models or users use primary key types other than integer (e.g., UUID, string), you'll need to modify the published migration before running it.
+
+After publishing the migration, edit the `model_id` and `user_id` columns in the migration file to match your primary key types:
+
+**For UUID primary keys:**
+
+```php
+// Change from:
+$table->unsignedBigInteger('model_id')->index();
+$table->unsignedBigInteger('user_id')->nullable();
+
+// To:
+$table->uuid('model_id')->index();
+$table->uuid('user_id')->nullable();
+```
+
+**For string primary keys:**
+
+```php
+// Change from:
+$table->unsignedBigInteger('model_id')->index();
+$table->unsignedBigInteger('user_id')->nullable();
+
+// To:
+$table->string('model_id')->index();
+$table->string('user_id')->nullable();
+```
+
+**For different types on model_id and user_id:**
+
+```php
+// Example: UUID for models, integer for users
+$table->uuid('model_id')->index();
+$table->unsignedBigInteger('user_id')->nullable();
+```
+
+The migration file will be published to `database/migrations/YYYY_MM_DD_HHMMSS_create_sku_histories_table.php`.
 
 ### Configuration
 
